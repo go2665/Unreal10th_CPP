@@ -129,7 +129,7 @@ void AActionCharacter::OnMoveAction(const FInputActionValue& Value)
 void AActionCharacter::OnRollAction(const FInputActionValue& Value)
 {
 	//UE_LOG(LogTemp, Log, TEXT("OnRollAction"));
-	if (!RollMontage.IsValid()) return;
+	if (!RollMontage) return;
 	
 	if (!AnimInstance)
 	{
@@ -143,7 +143,7 @@ void AActionCharacter::OnRollAction(const FInputActionValue& Value)
 			SetActorRotation(GetLastMovementInputVector().Rotation());	// 입력방향으로 즉시 회전해서 구르기
 		}
 
-		PlayAnimMontage(RollMontage.Get());
+		PlayAnimMontage(RollMontage);
 	}
 }
 

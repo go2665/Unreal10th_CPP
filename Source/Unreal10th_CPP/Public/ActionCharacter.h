@@ -56,7 +56,7 @@ protected:
 	TObjectPtr<UInputAction> IA_Roll;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TWeakObjectPtr<UAnimMontage> RollMontage;
+	TObjectPtr<UAnimMontage> RollMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float SprintSpeed = 1200;
