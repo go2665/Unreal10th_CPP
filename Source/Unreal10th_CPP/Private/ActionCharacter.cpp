@@ -28,7 +28,7 @@ AActionCharacter::AActionCharacter()
 void AActionCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
 // Called every frame
@@ -47,6 +47,14 @@ void AActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	{
 		EnhancedInputComponent->BindAction(IA_Test, ETriggerEvent::Started, this, &AActionCharacter::OnTestAction);
 		EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AActionCharacter::OnMoveAction);
+		EnhancedInputComponent->BindActionValueLambda(IA_Sprint, ETriggerEvent::Started,
+			[this](const FInputActionValue& _) {
+				OnSprintStart();
+			});
+		EnhancedInputComponent->BindActionValueLambda(IA_Sprint, ETriggerEvent::Completed,
+			[this](const FInputActionValue& _) {
+				OnSprintEnd();
+			});
 	}
 }
 
@@ -79,5 +87,15 @@ void AActionCharacter::OnMoveAction(const FInputActionValue& Value)
 	WorldDirection = ContolYawRotation.RotateVector(WorldDirection);
 
 	AddMovementInput(WorldDirection);
+}
+
+void AActionCharacter::OnSprintStart()
+{
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+}
+
+void AActionCharacter::OnSprintEnd()
+{
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 

@@ -33,6 +33,8 @@ protected:
 protected:
 	void OnTestAction(const FInputActionValue& Value);
 	void OnMoveAction(const FInputActionValue& Value);
+	void OnSprintStart();
+	void OnSprintEnd();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -40,6 +42,15 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UInputAction> IA_Move;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UInputAction> IA_Sprint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SprintSpeed = 1200;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float WalkSpeed = 600;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
