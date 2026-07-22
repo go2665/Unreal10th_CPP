@@ -46,6 +46,7 @@ void AActionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(IA_Test, ETriggerEvent::Started, this, &AActionCharacter::OnTestAction);
+		EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AActionCharacter::OnMoveAction);
 	}
 }
 
@@ -54,7 +55,29 @@ void AActionCharacter::OnTestAction(const FInputActionValue& Value)
 	UE_LOG(LogTemp, Log, TEXT("TestAction 실행"));
 
 	//Value.Get<bool>();
-	//Value.Get<FVector2D>();
 
+}
+
+void AActionCharacter::OnMoveAction(const FInputActionValue& Value)
+{
+	FVector2D Input = Value.Get<FVector2D>();
+	FVector WorldDirection = FVector(Input.Y, Input.X, 0).GetSafeNormal();
+	
+	//UE_LOG(LogTemp, Log, TEXT("Input : %.1f, %.1f"), Input.X, Input.Y);
+	//UE_LOG(LogTemp, Log, TEXT("Input : %s"), *Input.ToString());
+	//UE_LOG(LogTemp, Log, TEXT("WorldDirection : %.1f, %.1f"), WorldDirection.X, WorldDirection.Y);
+
+	//GetControlRotation(); 컨트롤러의 회전
+
+	// 카메라의 Yaw회전각(Degree)를 Radian으로 변경
+	float YawRadian = FMath::DegreesToRadians(GetControlRotation().Yaw);	
+	
+	// 좌우 회전만 할꺼라 UpVector를 기준축으로 Yaw회전각 만큼 돌리는 회전 만들기
+	FQuat ContolYawRotation(FVector::UpVector, YawRadian);					
+
+	// 입력된 방향에 회전 적용(=카메라 Yaw회전 만큼 입력방향을 회전 시키기)
+	WorldDirection = ContolYawRotation.RotateVector(WorldDirection);
+
+	AddMovementInput(WorldDirection);
 }
 

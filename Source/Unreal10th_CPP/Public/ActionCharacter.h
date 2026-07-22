@@ -32,10 +32,14 @@ protected:
 
 protected:
 	void OnTestAction(const FInputActionValue& Value);
+	void OnMoveAction(const FInputActionValue& Value);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UInputAction> IA_Test;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UInputAction> IA_Move;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
