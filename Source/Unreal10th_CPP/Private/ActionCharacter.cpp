@@ -6,6 +6,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
+#include "StatComponent.h"
 
 // Sets default values
 AActionCharacter::AActionCharacter()
@@ -20,53 +21,10 @@ AActionCharacter::AActionCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	CameraComponent->SetupAttachment(CameraSpringArmComponent);
 
+	StatComponent = CreateDefaultSubobject<UStatComponent>(TEXT("Stat"));
+
 	bUseControllerRotationYaw = false;	// 컨트롤러 움직일 때 폰이 같이 회전되는 것 방지
 	GetCharacterMovement()->bOrientRotationToMovement = true;	// 캐릭터 이동방향으로 바라보게 만들기
-}
-
-float AActionCharacter::GetCurrentStamina_Implementation() const
-{
-	return CurrentStamina;
-}
-
-bool AActionCharacter::ConsumeStamina_Implementation(float InAmount)
-{
-	bool bResult = false;
-	if (CurrentStamina >= InAmount)
-	{
-		CurrentStamina -= InAmount;
-
-		//StaminaAutoRecoverySecond = StaminaAutoRecoveryCoolTime;	// 스테미너를 사용 했으면 StaminaAutoRecoverySecond 리셋
-
-		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-		TimerManager.SetTimer(
-			StaminaAutoRecoveryTimerHandle,
-			this,
-			&AActionCharacter::StaminaAutoRecoverty,
-			StaminaAutoRecoveryInterval,
-			true,
-			StaminaAutoRecoveryCoolTime
-		);
-
-		bResult = true;
-	}
-
-	UE_LOG(LogTemp, Log, TEXT("Stamina : %.1f / %.1f"), CurrentStamina, MaxStamina);
-	return bResult;
-}
-
-void AActionCharacter::RecoveryStamina_Implementation(float InAmount)
-{
-	CurrentStamina = FMath::Clamp(CurrentStamina + InAmount, 0.0f, MaxStamina);
-	UE_LOG(LogTemp, Log, TEXT("Stamina : %.1f / %.1f"), CurrentStamina, MaxStamina);
-
-	//FMath::IsNearlyEqual(CurrentStamina, MaxStamina)
-	if (CurrentStamina >= MaxStamina)
-	{
-		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-		TimerManager.ClearTimer(StaminaAutoRecoveryTimerHandle);
-	}
-
 }
 
 // Called when the game starts or when spawned
@@ -81,11 +39,14 @@ void AActionCharacter::BeginPlay()
 	{
 		AnimInstance = GetMesh()->GetAnimInstance();
 	}
-
-	CurrentStamina = MaxStamina;
-
-	//GetCurrentStamina();	// 실행했을 때 C++에 구현된 내용만 호출한다.
-	//IStaminaInterface::Execute_GetCurrentStamina(this);	// 실행했을 때 블루프린트 구현으로 호출한다.
+	if (StatComponent)
+	{
+		FAutoRecoveryData Data = FAutoRecoveryData(
+			StaminaAutoRecoveryCoolTime,
+			StaminaAutoRecoveryInterval,
+			StaminaAutoRecoveryPerTick);
+		StatComponent->InitializeStat(Data);
+	}
 }
 
 // Called every frame
@@ -94,7 +55,6 @@ void AActionCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	SpendSprintStamina(DeltaTime);
-	//StaminaAutoRecoverty(DeltaTime);
 }
 
 void AActionCharacter::SpendSprintStamina(float DeltaTime)
@@ -104,25 +64,10 @@ void AActionCharacter::SpendSprintStamina(float DeltaTime)
 		(AnimInstance && !AnimInstance->IsAnyMontagePlaying()))
 	{
 		// 스테미너 지속적으로 감소
-		if (!IStaminaInterface::Execute_ConsumeStamina(this, SprintStaminaCostPerSec * DeltaTime))
+		if(!IStaminaInterface::Execute_ConsumeStamina(StatComponent, SprintStaminaCostPerSec * DeltaTime))
 		{
 			OnSprintEnd();	// 스테미너가 다 떨어지면 달리기 모드 정지
 		}
-	}
-}
-
-void AActionCharacter::StaminaAutoRecoverty()
-{
-	IStaminaInterface::Execute_RecoveryStamina(this, StaminaAutoRecoveryPerTick);
-}
-
-// 타이머로 대체해서 더 이상 안 씀
-void AActionCharacter::StaminaAutoRecoverty(float DeltaTime)
-{
-	StaminaAutoRecoverySecond -= DeltaTime;
-	if (StaminaAutoRecoverySecond < 0.0f)
-	{
-		IStaminaInterface::Execute_RecoveryStamina(this, StaminaAutoRecoveryPerSec * DeltaTime);
 	}
 }
 
@@ -188,7 +133,7 @@ void AActionCharacter::OnRollAction(const FInputActionValue& Value)
 		AnimInstance = GetMesh()->GetAnimInstance();
 	}
 
-	if (IStaminaInterface::Execute_ConsumeStamina(this, RollStaminaCost))	// 스테미너 소비 시도 후 소비되면 구르기 실행
+	if (IStaminaInterface::Execute_ConsumeStamina(StatComponent, RollStaminaCost))	// 스테미너 소비 시도 후 소비되면 구르기 실행
 	{
 		if (AnimInstance && !AnimInstance->IsAnyMontagePlaying())
 		{

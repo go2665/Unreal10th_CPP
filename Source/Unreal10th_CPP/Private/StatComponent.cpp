@@ -8,9 +8,14 @@ UStatComponent::UStatComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
+}
+
+void UStatComponent::InitializeStat(FAutoRecoveryData& InData)
+{
+	StaminaRecoveryData = InData;
 }
 
 float UStatComponent::GetCurrentStamina_Implementation() const
@@ -25,16 +30,14 @@ bool UStatComponent::ConsumeStamina_Implementation(float InAmount)
 	{
 		CurrentStamina -= InAmount;
 
-		//StaminaAutoRecoverySecond = StaminaAutoRecoveryCoolTime;	// 스테미너를 사용 했으면 StaminaAutoRecoverySecond 리셋
-
 		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
 		TimerManager.SetTimer(
 			StaminaAutoRecoveryTimerHandle,
 			this,
-			&AActionCharacter::StaminaAutoRecoverty,
-			StaminaAutoRecoveryInterval,
+			&UStatComponent::StaminaAutoRecovertyPerTick,
+			StaminaRecoveryData.TickInterval,
 			true,
-			StaminaAutoRecoveryCoolTime
+			StaminaRecoveryData.CoolTime
 		);
 
 		bResult = true;
@@ -42,6 +45,11 @@ bool UStatComponent::ConsumeStamina_Implementation(float InAmount)
 
 	UE_LOG(LogTemp, Log, TEXT("Stamina : %.1f / %.1f"), CurrentStamina, MaxStamina);
 	return bResult;
+}
+
+void UStatComponent::StaminaAutoRecovertyPerTick()
+{
+	IStaminaInterface::Execute_RecoveryStamina(this, StaminaRecoveryData.RecoveryPerTick);
 }
 
 void UStatComponent::RecoveryStamina_Implementation(float InAmount)
@@ -57,13 +65,15 @@ void UStatComponent::RecoveryStamina_Implementation(float InAmount)
 	}
 }
 
-
 // Called when the game starts
 void UStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
 	CurrentStamina = MaxStamina;
+
+	//GetCurrentStamina();	// 실행했을 때 C++에 구현된 내용만 호출한다.
+	//IStaminaInterface::Execute_GetCurrentStamina(this);	// 실행했을 때 블루프린트 구현으로 호출한다.
 	
 }
 
@@ -76,3 +86,15 @@ void UStatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	// ...
 }
 
+
+
+
+//// 타이머로 대체해서 더 이상 안 씀
+//void UStatComponent::StaminaAutoRecoverty(float DeltaTime)
+//{
+//	StaminaAutoRecoverySecond -= DeltaTime;
+//	if (StaminaAutoRecoverySecond < 0.0f)
+//	{
+//		IStaminaInterface::Execute_RecoveryStamina(this, StaminaAutoRecoveryPerSec * DeltaTime);
+//	}
+//}
