@@ -36,7 +36,18 @@ bool AActionCharacter::ConsumeStamina_Implementation(float InAmount)
 	{
 		CurrentStamina -= InAmount;
 
-		StaminaAutoRecoveryTimer = StaminaAutoRecoveryCoolTime;	// 스테미너를 사용 했으면 StaminaAutoRecoveryTimer 리셋
+		//StaminaAutoRecoverySecond = StaminaAutoRecoveryCoolTime;	// 스테미너를 사용 했으면 StaminaAutoRecoverySecond 리셋
+
+		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+		TimerManager.SetTimer(
+			StaminaAutoRecoveryTimerHandle,
+			this,
+			&AActionCharacter::StaminaAutoRecoverty,
+			StaminaAutoRecoveryInterval,
+			true,
+			StaminaAutoRecoveryCoolTime
+		);
+
 		bResult = true;
 	}
 
@@ -48,6 +59,14 @@ void AActionCharacter::RecoveryStamina_Implementation(float InAmount)
 {
 	CurrentStamina = FMath::Clamp(CurrentStamina + InAmount, 0.0f, MaxStamina);
 	UE_LOG(LogTemp, Log, TEXT("Stamina : %.1f / %.1f"), CurrentStamina, MaxStamina);
+
+	//FMath::IsNearlyEqual(CurrentStamina, MaxStamina)
+	if (CurrentStamina >= MaxStamina)
+	{
+		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+		TimerManager.ClearTimer(StaminaAutoRecoveryTimerHandle);
+	}
+
 }
 
 // Called when the game starts or when spawned
@@ -75,7 +94,7 @@ void AActionCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	SpendSprintStamina(DeltaTime);
-	StaminaAutoRecoverty(DeltaTime);
+	//StaminaAutoRecoverty(DeltaTime);
 }
 
 void AActionCharacter::SpendSprintStamina(float DeltaTime)
@@ -92,10 +111,16 @@ void AActionCharacter::SpendSprintStamina(float DeltaTime)
 	}
 }
 
+void AActionCharacter::StaminaAutoRecoverty()
+{
+	IStaminaInterface::Execute_RecoveryStamina(this, StaminaAutoRecoveryPerTick);
+}
+
+// 타이머로 대체해서 더 이상 안 씀
 void AActionCharacter::StaminaAutoRecoverty(float DeltaTime)
 {
-	StaminaAutoRecoveryTimer -= DeltaTime;
-	if (StaminaAutoRecoveryTimer < 0.0f)
+	StaminaAutoRecoverySecond -= DeltaTime;
+	if (StaminaAutoRecoverySecond < 0.0f)
 	{
 		IStaminaInterface::Execute_RecoveryStamina(this, StaminaAutoRecoveryPerSec * DeltaTime);
 	}
