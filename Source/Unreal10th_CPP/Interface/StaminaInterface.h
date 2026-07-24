@@ -26,6 +26,9 @@ public:
 	float GetCurrentStamina() const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Stamina")
+	float GetMaxStamina() const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Stamina")
 	bool ConsumeStamina(float InAmount);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Stamina")

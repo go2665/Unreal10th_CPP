@@ -27,6 +27,11 @@ AActionCharacter::AActionCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;	// 캐릭터 이동방향으로 바라보게 만들기
 }
 
+UStatComponent* AActionCharacter::GetStatComponent() const
+{
+	return StatComponent;
+}
+
 // Called when the game starts or when spawned
 void AActionCharacter::BeginPlay()
 {

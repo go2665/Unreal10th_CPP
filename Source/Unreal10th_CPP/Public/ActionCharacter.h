@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "../Interface/StatInterface.h"
 #include "ActionCharacter.generated.h"
 
 class UInputAction;
@@ -13,13 +14,16 @@ class UCameraComponent;
 class UStatComponent;
 
 UCLASS()
-class UNREAL10TH_CPP_API AActionCharacter : public ACharacter
+class UNREAL10TH_CPP_API AActionCharacter : public ACharacter, public IStatInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
 	AActionCharacter();	
+
+	UFUNCTION(BlueprintCallable, Category = "Stat")
+	virtual UStatComponent* GetStatComponent() const override;
 
 protected:
 	// Called when the game starts or when spawned

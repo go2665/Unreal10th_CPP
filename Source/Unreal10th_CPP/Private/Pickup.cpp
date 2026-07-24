@@ -4,7 +4,10 @@
 #include "Pickup.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "StatComponent.h"
 #include "../Interface/StaminaInterface.h"
+#include "../Interface/HealthInterface.h"
+#include "../Interface/StatInterface.h"
 
 // Sets default values
 APickup::APickup()
@@ -36,18 +39,34 @@ void APickup::Tick(float DeltaTime)
 
 void APickup::NotifyActorBeginOverlap(AActor* OtherActor)
 {
+	Super::NotifyActorBeginOverlap(OtherActor);
+	ApplyEffects(OtherActor);
+}
+
+void APickup::ApplyEffects(AActor* InTarget)
+{
 	// bImplements이 true면 인터페이스를 구현했다.
 	// bool bImplements = OtherActor->Implements<UStaminaInterface>()
-
-	if (OtherActor && OtherActor->Implements<UStaminaInterface>())
+	
+	if (IStatInterface* Stat = Cast<IStatInterface>(InTarget))
 	{
+		UStatComponent* StatComp = Stat->GetStatComponent();
 		if (Stamina > 0)
 		{
-			IStaminaInterface::Execute_RecoveryStamina(OtherActor, Stamina);
+			IStaminaInterface::Execute_RecoveryStamina(StatComp, Stamina);
 		}
-		else
+		else if(Stamina < 0)
 		{
-			IStaminaInterface::Execute_ConsumeStamina(OtherActor, -Stamina);
+			IStaminaInterface::Execute_ConsumeStamina(StatComp, -Stamina);
+		}
+
+		if (Health > 0)
+		{
+			IHealthInterface::Execute_HealHealth(StatComp, Health);
+		}
+		else if (Health < 0)
+		{
+			IHealthInterface::Execute_DamageHealth(StatComp, -Health);
 		}
 	}
 

@@ -24,6 +24,11 @@ float UStatComponent::GetCurrentStamina_Implementation() const
 	return CurrentStamina;
 }
 
+float UStatComponent::GetMaxStamina_Implementation() const
+{
+	return MaxStamina;
+}
+
 bool UStatComponent::ConsumeStamina_Implementation(float InAmount)
 {
 	bool bResult = false;
@@ -64,6 +69,36 @@ void UStatComponent::RecoveryStamina_Implementation(float InAmount)
 		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
 		TimerManager.ClearTimer(StaminaAutoRecoveryTimerHandle);
 	}
+}
+
+float UStatComponent::GetCurrentHealth_Implementation() const
+{
+	return CurrentHealth;
+}
+
+float UStatComponent::GetMaxHealth_Implementation() const
+{
+	return MaxHealth;
+}
+
+bool UStatComponent::DamageHealth_Implementation(float InAmount)
+{
+	bool bResult = false;
+	if (CurrentHealth >= InAmount)
+	{
+		CurrentHealth -= InAmount;
+
+		bResult = true;
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Health : %.1f / %.1f"), CurrentStamina, MaxStamina);
+	return bResult;
+}
+
+void UStatComponent::HealHealth_Implementation(float InAmount)
+{
+	CurrentHealth = FMath::Clamp(CurrentHealth + InAmount, 0.0f, MaxHealth);
+	UE_LOG(LogTemp, Log, TEXT("Health : %.1f / %.1f"), CurrentHealth, MaxHealth);
 }
 
 // Called when the game starts
