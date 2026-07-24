@@ -29,6 +29,7 @@ AActionCharacter::AActionCharacter()
 
 UStatComponent* AActionCharacter::GetStatComponent() const
 {
+	//return nullptr;
 	return StatComponent;
 }
 

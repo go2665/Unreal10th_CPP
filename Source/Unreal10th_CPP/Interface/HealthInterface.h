@@ -29,7 +29,7 @@ public:
 	float GetMaxHealth() const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Health")
-	bool DamageHealth(float InAmount);
+	void DamageHealth(float InAmount);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Health")
 	void HealHealth(float InAmount);

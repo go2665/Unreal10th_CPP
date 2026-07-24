@@ -8,6 +8,31 @@
 #include "../Interface/HealthInterface.h"
 #include "StatComponent.generated.h"
 
+//DECLARE_DELEGATE(FNormal);			// 함수 포인터 사용. 빠르다.
+//DECLARE_DYNAMIC_DELEGATE(FDynamic);	// 리플랙션 시스템 사용(문자열을 키로 하는 테이블). 느리다.
+//
+//DECLARE_MULTICAST_DELEGATE(FMulticast);	// 바인딩 시킬 함수를 여러개 저장할 수 있다.
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDynamicMulticast);
+//
+//DECLARE_MULTICAST_DELEGATE_TwoParams(FMulticast2Param, int, float);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDynamicMulti1Param, int, Data);
+//
+//DECLARE_DELEGATE_RetVal(int, FNormalReturn);	// 리턴을 int로 하는 델리게이트
+//DECLARE_DYNAMIC_DELEGATE_RetVal_OneParam(float, FDynamicReturn, int, Data); // 리턴이 float이고 파라메터가 int Data인 다이나믹 델리게이트
+//
+//// DYNAMIC 델리게이트에 바인딩하는 함수는 UFUNCTION이 반드시 붙어 있어야 한다.(람다식 사용 불가)
+//
+//// Event
+//// - 델리게이트와 거의 같음
+//// - 기본적으로 멀티캐스트(리스너가 여러명)
+//// - 리턴값이 무조건 없다.
+//// - 클래스 밖에서 호출을 할 수 없다.
+//// - C++ 전용
+//DECLARE_EVENT(AActor, FTestEvent);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStatEmpty);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStatChange, float, Current, float, Max);
+
 struct FAutoRecoveryData
 {
 	float CoolTime = 3.0f;			// 자동 회복이 있을 때까지 걸릴 시간
@@ -42,8 +67,18 @@ public:
 
 	virtual float GetCurrentHealth_Implementation() const override;
 	virtual float GetMaxHealth_Implementation() const override;
-	virtual bool DamageHealth_Implementation(float InAmount) override;
+	virtual void DamageHealth_Implementation(float InAmount) override;
 	virtual void HealHealth_Implementation(float InAmount) override;
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Stat|Stamina")
+	FOnStatEmpty OnStaminaEmpty;
+	UPROPERTY(BlueprintAssignable, Category = "Stat|Health")
+	FOnStatEmpty OnDie;
+	UPROPERTY(BlueprintAssignable, Category = "Stat|Stamina")
+	FOnStatChange OnStaminaChange;
+	UPROPERTY(BlueprintAssignable, Category = "Stat|Health")
+	FOnStatChange OnHealthChange;
 
 protected:
 	// Called when the game starts
@@ -80,4 +115,6 @@ private:
 
 	// 스태미너 자동 회복용 데이터
 	FAutoRecoveryData StaminaRecoveryData;
+
+	const float EmptyCheckLimit = 0.01f;
 };
