@@ -11,6 +11,10 @@ UStatComponent::UStatComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
+	//OnStaminaEmpty.AddDynamic(this, &UStatComponent::StaminaAutoRecovertyPerTick);
+	//FScriptDelegate Test;
+	//Test.BindUFunction(this, FName("UStatComponent::StaminaAutoRecovertyPerTick"));
+	//OnStaminaEmpty.Add(Test);
 }
 
 void UStatComponent::InitializeStat(FAutoRecoveryData& InData)
