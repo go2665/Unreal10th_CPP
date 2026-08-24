@@ -40,7 +40,7 @@ public:
 
 	// WeaponComponent로 전달할 함수들 ---------------------------------------------------------------
 	// 무기 장비 관련 함수들
-	virtual void EquipWeapon_Implementation(UWeaponDataAsset* InWeaponData) override;
+	virtual void EquipWeapon_Implementation(const UWeaponDataAsset* InWeaponData) override;
 	//void UnEquipWeapon();
 	//-------------------------------------------------------------------------------------------------
 

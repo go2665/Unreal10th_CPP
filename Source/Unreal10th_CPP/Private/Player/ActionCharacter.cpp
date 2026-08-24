@@ -35,7 +35,7 @@ AActionCharacter::AActionCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;	// 캐릭터 이동방향으로 바라보게 만들기
 }
 
-void AActionCharacter::EquipWeapon_Implementation(UWeaponDataAsset* InWeaponData)
+void AActionCharacter::EquipWeapon_Implementation(const UWeaponDataAsset* InWeaponData)
 {
 	if (GetWeaponComponent())
 	{

@@ -39,7 +39,7 @@ AWeaponActor::AWeaponActor()
 	TrailVFX->SetupAttachment(Mesh);
 }
 
-void AWeaponActor::InitializeWeapon(UWeaponDataAsset* InData)
+void AWeaponActor::InitializeWeapon(const UWeaponDataAsset* InData)
 {
 	if (!InData) return;
 

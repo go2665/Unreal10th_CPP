@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "WeaponActor.generated.h"
 
-DECLARE_DELEGATE_OneParam(FOnWeaponDrop, UWeaponDataAsset*);
+DECLARE_DELEGATE_OneParam(FOnWeaponDrop, const UWeaponDataAsset*);
 
 class ACharacter;
 class UCapsuleComponent;
@@ -22,7 +22,7 @@ public:
 	AWeaponActor();
 
 	UFUNCTION(BlueprintCallable)
-	void InitializeWeapon(UWeaponDataAsset* InData);
+	void InitializeWeapon(const UWeaponDataAsset* InData);
 
 	UFUNCTION(BlueprintCallable)
 	void EquipToTarget(AActor* Target);
@@ -77,7 +77,7 @@ protected:
 
 	// 무기 데이터 에셋
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UWeaponDataAsset> WeaponData;
+	TObjectPtr<const UWeaponDataAsset> WeaponData;
 
 	// 무기 사용 회수
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WeaponData")

@@ -4,6 +4,8 @@
 #include "Component/InventoryComponent.h"
 #include "Framework/SubSystem/PickupFactorySubsystem.h"
 #include "Data/Item/UseableItemDataAsset.h"
+#include "Data/Item/WeaponDataAsset.h"
+#include "Interface/WeaponUserInterface.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -38,6 +40,8 @@ bool UInventoryComponent::ExecuteCommand(const FInventoryCommand& Command, FInve
 	case EInventoryCommandType::Money:
 		HandleMoneyCommand(Command.Count, OutResult);
 		break;
+	case EInventoryCommandType::Equip:
+		HandleEquipCommand(Command.SourceIndex, OutResult);
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("알 수 없는 커맨드 입니다"));
 		break;
@@ -110,6 +114,21 @@ void UInventoryComponent::UseItem(int32 InIndex)
 			if (Useable->ItemAction)
 			{
 				Useable->ItemAction->ExecuteAction_Implementation(GetOwner(), GetOwner());
+				UpdateSlotCount(InIndex, -1);
+			}
+		}
+	}
+}
+
+void UInventoryComponent::EquipItem(int32 InIndex)
+{
+	if (FInvenSlot* InvenSlot = GetSlot(InIndex))
+	{
+		if (const UWeaponDataAsset* Weapon = Cast<const UWeaponDataAsset>(InvenSlot->ItemData))
+		{
+			if (GetOwner()->Implements<UWeaponUserInterface>())
+			{
+				IWeaponUserInterface::Execute_EquipWeapon(GetOwner(), Weapon);
 				UpdateSlotCount(InIndex, -1);
 			}
 		}
@@ -339,6 +358,20 @@ bool UInventoryComponent::HandleMoneyCommand(int32 InMoneyDiff, FInventoryComman
 	OutResult.bSuccess = false;
 
 	AddMoney(InMoneyDiff);
+	OutResult.bSuccess = true;
+
+	return OutResult.bSuccess;
+}
+
+bool UInventoryComponent::HandleEquipCommand(int32 InSlotIndex, FInventoryCommandResult& OutResult)
+{
+	OutResult.bSuccess = false;
+	if (!IsValidIndex(InSlotIndex))
+	{
+		return OutResult.bSuccess;
+	}
+
+	EquipItem(InSlotIndex);
 	OutResult.bSuccess = true;
 
 	return OutResult.bSuccess;

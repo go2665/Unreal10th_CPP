@@ -107,6 +107,9 @@ protected:
 	// 인벤토리의 특정 슬롯에 들어있는 아이템 사용하는 함수
 	void UseItem(int32 InIndex);
 
+	// 인벤토리의 특정 슬롯에 들어있는 아이템을 장비하는 함수
+	void EquipItem(int32 InIndex);
+
 	// 특정 슬롯에 아이템과 개수를 설정하는 함수
 	void SetSlot(int32 InSlotIndex, const UItemDataAsset* InItemData, int32 InCount);
 	
@@ -128,6 +131,7 @@ protected:
 	bool HandleUseCommand(int32 InSlotIndex, FInventoryCommandResult& OutResult);
 	bool HandleClearCommand(int32 InSlotIndex, FInventoryCommandResult& OutResult);
 	bool HandleMoneyCommand(int32 InMoneyDiff, FInventoryCommandResult& OutResult);
+	bool HandleEquipCommand(int32 InSlotIndex, FInventoryCommandResult& OutResult);
 	// ------------------------------------------------------------------------------------------------------------
 
 	// 사용안함. Called when the game starts

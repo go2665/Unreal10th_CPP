@@ -54,7 +54,7 @@ void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	// ...
 }
 
-void UWeaponComponent::EquipWeapon(UWeaponDataAsset* InWeaponData)
+void UWeaponComponent::EquipWeapon(const UWeaponDataAsset* InWeaponData)
 {
 	if (InWeaponData == CurrentWeaponData)
 	{
@@ -79,7 +79,7 @@ void UWeaponComponent::EquipWeapon(UWeaponDataAsset* InWeaponData)
 			if (!CurrentWeaponData->IsLoaded())
 			{
 				// 데이터가 로딩 안되었으면 로딩 요청
-				UWeaponDataAsset* RequestedData = CurrentWeaponData;
+				const UWeaponDataAsset* RequestedData = CurrentWeaponData;
 				CurrentWeaponData->RequestDataLoad(
 					FStreamableDelegate::CreateWeakLambda(
 						this,
@@ -171,7 +171,7 @@ void UWeaponComponent::AreaAttack()
 
 }
 
-void UWeaponComponent::OnWeaponDrop(UWeaponDataAsset* InDropWeaponData)
+void UWeaponComponent::OnWeaponDrop(const UWeaponDataAsset* InDropWeaponData)
 {
 	if (DefaultWeaponData && (DefaultWeaponData != InDropWeaponData))
 	{

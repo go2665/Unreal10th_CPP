@@ -144,6 +144,28 @@ void UInventorySlotWidget::NativeOnDragCancelled(const FDragDropEvent& InDragDro
 				SpawnLocation = End;
 			}
 
+			// 일정 거리 이상 멀어지는 것 방지
+			if (APawn* PlayerPawn = PC->GetPawn())
+			{
+				const float MaxDistance = 500.0f;
+				FVector PlayerLocation = PlayerPawn->GetActorLocation();
+				if (FVector::DistSquared2D(SpawnLocation, PlayerLocation) > MaxDistance * MaxDistance)
+				{
+					FVector Direction = (SpawnLocation - PlayerLocation).GetSafeNormal2D();
+					SpawnLocation = PlayerLocation + Direction * MaxDistance;
+
+					// SpawnLocation이 벽 안이 되는 것을 방지
+					FVector DownStart = SpawnLocation + FVector::UpVector * 10000.0f;
+					FVector DownEnd = SpawnLocation + FVector::DownVector * 10000.0f;
+					FHitResult GroundHit;
+					if (GetWorld()->LineTraceSingleByChannel(GroundHit, DownStart, DownEnd, ECollisionChannel::ECC_Visibility))
+					{
+						SpawnLocation = GroundHit.Location;	
+					}
+				}
+			}
+
+			// 실제 드랍 생성
 			FInventoryCommandResult Result;
 			TargetInventory->ExecuteCommand(
 				FInventoryCommand::MakeDrop(TargetInventory->GetTempSlotIndex(), SpawnLocation),
@@ -170,12 +192,14 @@ FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry
 	}
 	else if (InMouseEvent.IsMouseButtonDown(EKeys::RightMouseButton))
 	{
+		// 마우스 오른쪽이 눌려져 있다.
 		if (FInvenSlot* InvenSlot = TargetInventory->GetSlot(Index))
 		{
 			if (!InvenSlot->IsEmpty())
 			{
 				FInventoryCommandResult Result;
 				TargetInventory->ExecuteCommand(FInventoryCommand::MakeUse(Index), Result);
+				TargetInventory->ExecuteCommand(FInventoryCommand::MakeEquip(Index), Result);
 			}
 		}
 	}

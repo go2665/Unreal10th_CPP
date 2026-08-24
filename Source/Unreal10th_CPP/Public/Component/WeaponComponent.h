@@ -23,7 +23,7 @@ public:
 	UWeaponComponent();
 
 	// 무기 장비 처리
-	void EquipWeapon(UWeaponDataAsset* InWeaponData);
+	void EquipWeapon(const UWeaponDataAsset* InWeaponData);
 	
 	// 공격 처리 함수(리턴값은 공격을 했는지 여부)
 	bool Attack();
@@ -35,7 +35,7 @@ public:
 	// 이벤트 함수들 ---------------------------------------------------------------------------------
 	
 	// 무기를 다 사용하여 드랍되었을 때 실행될 함수(웨폰 액터 쪽에서 바인딩)
-	void OnWeaponDrop(UWeaponDataAsset* InDropWeaponData);
+	void OnWeaponDrop(const UWeaponDataAsset* InDropWeaponData);
 
 	// 무기 공격 활성화/비활성화 때 실행되는 함수
 	void OnWeaponAttackState(bool bEnable);	
@@ -78,11 +78,11 @@ protected:
 
 	// 현재 장비할 무기의 데이터 에셋(임시 : 무기 관리자로 넘길 예정)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
-	TObjectPtr<UWeaponDataAsset> CurrentWeaponData = nullptr;
+	TObjectPtr<const UWeaponDataAsset> CurrentWeaponData = nullptr;
 
 	// 기본 무기의 데이터 에셋
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
-	TObjectPtr<UWeaponDataAsset> DefaultWeaponData = nullptr;
+	TObjectPtr<const UWeaponDataAsset> DefaultWeaponData = nullptr;
 
 private:
 	// 발생한 콤보 노티파이를 저장해 놓는 변수
