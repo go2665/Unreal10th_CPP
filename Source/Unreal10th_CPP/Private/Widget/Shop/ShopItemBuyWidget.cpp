@@ -20,7 +20,6 @@ void UShopItemBuyWidget::NativeConstruct()
 	{
 		ItemCount->SetHintText(FText::AsNumber(MinimumBuyCount));
 		ItemCount->OnTextChanged.AddDynamic(this, &UShopItemBuyWidget::OnItemCountTextChanged);		// 변경이 있을 때
-		ItemCount->OnTextCommitted.AddDynamic(this, &UShopItemBuyWidget::OnItemCountTextCommitted);	// 변경을 확정했을 때(엔터친 후, 포커스를 잃은 후)
 	}
 
 	if (ItemBuy)
