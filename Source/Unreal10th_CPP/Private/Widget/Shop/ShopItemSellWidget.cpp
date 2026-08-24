@@ -9,12 +9,12 @@
 bool UShopItemSellWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	FInventoryCommandResult Result;
-	if (IInventoryUserInterface* InventoryUI = Cast<IInventoryUserInterface>(GetOwningPlayerPawn()))
+	if (IInventoryUserInterface* InventoryUser = Cast<IInventoryUserInterface>(GetOwningPlayerPawn()))
 	{
-		if (UInventoryComponent* InvenComp = InventoryUI->GetInventoryComponent())
+		if (UInventoryComponent* InvenComp = InventoryUser->GetInventoryComponent())
 		{
 			int32 TempIndex = InvenComp->GetTempSlotIndex();
-			InventoryUI->ExecuteInventoryCommand(FInventoryCommand::MakeSell(TempIndex), Result);
+			InventoryUser->ExecuteInventoryCommand(FInventoryCommand::MakeSell(TempIndex), Result);
 		}
 	}
 

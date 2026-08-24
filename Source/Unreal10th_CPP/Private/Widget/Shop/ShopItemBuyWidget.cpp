@@ -74,15 +74,15 @@ void UShopItemBuyWidget::OnBuyButtonClicked()
 {
 	//UE_LOG(LogTemp, Log, TEXT("구매 버튼 클릭"));
 
-	if (IInventoryUserInterface* InventoryUI = Cast<IInventoryUserInterface>(GetOwningPlayerPawn()))
+	if (IInventoryUserInterface* InventoryUser = Cast<IInventoryUserInterface>(GetOwningPlayerPawn()))
 	{
-		if (UInventoryComponent* InvenComp = InventoryUI->GetInventoryComponent())
+		if (UInventoryComponent* InvenComp = InventoryUser->GetInventoryComponent())
 		{
 			int32 TempIndex = InvenComp->GetTempSlotIndex();
 			FInventoryCommandResult ResultAdd;
-			InventoryUI->ExecuteInventoryCommand(FInventoryCommand::MakeAdd(ItemData.Get(), BuyCount), ResultAdd);			// 구매한 아이템을 인벤토리에 추가
+			InventoryUser->ExecuteInventoryCommand(FInventoryCommand::MakeAdd(ItemData.Get(), BuyCount), ResultAdd);			// 구매한 아이템을 인벤토리에 추가
 			FInventoryCommandResult ResultMoney;
-			InventoryUI->ExecuteInventoryCommand(FInventoryCommand::MakeMoney(-ItemData->Price * BuyCount), ResultMoney);	// 구매한 아이템의 가격만큼 돈을 차감
+			InventoryUser->ExecuteInventoryCommand(FInventoryCommand::MakeMoney(-ItemData->Price * BuyCount), ResultMoney);	// 구매한 아이템의 가격만큼 돈을 차감
 
 			SetStockCount(StockCount - BuyCount);
 			SetBuyCount(MinimumBuyCount);
@@ -147,9 +147,9 @@ void UShopItemBuyWidget::UpdateBuyButton() const
 	}
 	else
 	{
-		if (IInventoryUserInterface* InventoryUI = Cast<IInventoryUserInterface>(GetOwningPlayerPawn()))
+		if (IInventoryUserInterface* InventoryUser = Cast<IInventoryUserInterface>(GetOwningPlayerPawn()))
 		{
-			if (UInventoryComponent* InvenComp = InventoryUI->GetInventoryComponent())
+			if (UInventoryComponent* InvenComp = InventoryUser->GetInventoryComponent())
 			{
 				bool hasEnoughMoney = InvenComp->GetMoney() >= (BuyCount * ItemData->Price);
 				ItemBuy->SetIsEnabled(hasEnoughMoney);
