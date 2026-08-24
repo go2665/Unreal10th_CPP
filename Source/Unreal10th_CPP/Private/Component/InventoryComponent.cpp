@@ -42,6 +42,9 @@ bool UInventoryComponent::ExecuteCommand(const FInventoryCommand& Command, FInve
 		break;
 	case EInventoryCommandType::Equip:
 		HandleEquipCommand(Command.SourceIndex, OutResult);
+	case EInventoryCommandType::Sell:
+		HandleSellCommand(Command.TargetIndex, OutResult);
+		break;
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("알 수 없는 커맨드 입니다"));
 		break;
@@ -360,6 +363,24 @@ bool UInventoryComponent::HandleMoneyCommand(int32 InMoneyDiff, FInventoryComman
 	AddMoney(InMoneyDiff);
 	OutResult.bSuccess = true;
 
+	return OutResult.bSuccess;
+}
+
+bool UInventoryComponent::HandleSellCommand(int32 InSlotIndex, FInventoryCommandResult& OutResult)
+{
+	FInvenSlot* TargetSlot = GetSlot(InSlotIndex);
+	if(TargetSlot->IsEmpty())
+	{
+		OutResult.bSuccess = false;
+		return OutResult.bSuccess;
+	}
+
+	int32 SellPrice = TargetSlot->ItemData->Price * 0.5f;
+	AddMoney(SellPrice * TargetSlot->GetCount());
+
+	ClearSlot(InSlotIndex);
+
+	OutResult.bSuccess = true;
 	return OutResult.bSuccess;
 }
 

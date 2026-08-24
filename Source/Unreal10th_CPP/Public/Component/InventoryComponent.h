@@ -131,6 +131,7 @@ protected:
 	bool HandleUseCommand(int32 InSlotIndex, FInventoryCommandResult& OutResult);
 	bool HandleClearCommand(int32 InSlotIndex, FInventoryCommandResult& OutResult);
 	bool HandleMoneyCommand(int32 InMoneyDiff, FInventoryCommandResult& OutResult);
+	bool HandleSellCommand(int32 InSlotIndex, FInventoryCommandResult& OutResult);
 	bool HandleEquipCommand(int32 InSlotIndex, FInventoryCommandResult& OutResult);
 	// ------------------------------------------------------------------------------------------------------------
 

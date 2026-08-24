@@ -15,7 +15,7 @@ struct FItemDropTableRow : public FTableRowBase
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	//TSubclassOf<AActor> DropItemClass;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UItemDataAsset> PickupData;
+	TObjectPtr<const UItemDataAsset> PickupData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = "0", ClampMax = "1"))
 	float DropRate = 0.5f;
